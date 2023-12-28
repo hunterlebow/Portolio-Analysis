@@ -15,6 +15,7 @@ class Portfolio():
         self.investments = investments
         self.portfolio = pd.DataFrame()
         self.polygon = Polygon()
+    
 
     def build_portfolio(self):
         for investment in self.investments:

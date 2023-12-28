@@ -68,42 +68,51 @@ class Simulation():
             "volatilities": portfolio_volatilities,
             "sharpe_ratios": sharpe_ratios
         }
+        
 
-    def visualize_efficient_frontier(self, simulation_results: dict, figsize_x=9, figsize_y=7):
-        """
-        Plots the results of the Monte Carlo simulation as an efficient frontier and calculates simulation statistics.
-
-        :param simulation_results: Dict, the results returned from simulate().
-        :param figsize_x: Int, the size of x axis of figure output.
-        :param figsize_y: Int, the size of y axis of figure output.
-        :return: Matplotlib graph of efficient frontier and displays simulation statistics.
-        """
+    def visualize_simulation_results(self, simulation_results):
+        # Unpack simulation results
         weights = simulation_results["weights"]
         returns = simulation_results["returns"]
         vols = simulation_results["volatilities"]
         sharpe_ratios = simulation_results["sharpe_ratios"]
         max_sharpe_index = sharpe_ratios.index(max(sharpe_ratios))
-        max_sharpe_portfolio = weights[max_sharpe_index]
+        max_sharpe_weights = weights[max_sharpe_index]
 
-        # Creating a figure with two subplots
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=[figsize_x, figsize_y])
+        # Calculate cumulative returns
+        daily_returns = self.get_pct_returns()
+        weighted_returns = daily_returns * max_sharpe_weights
+        portfolio_returns = weighted_returns.sum(axis=1)
+        cumulative_returns = (1 + portfolio_returns).cumprod()
 
-        # Plotting the Efficient Frontier on the first subplot
-        sc = ax1.scatter(vols, returns, c=sharpe_ratios, cmap='RdYlGn')
-        ax1.scatter(vols[max_sharpe_index], returns[max_sharpe_index],
-                    c="black", marker='*', s=500)  # Highlight the max Sharpe ratio
-        ax1.set_xlabel('Volatility')
-        ax1.set_ylabel('Return')
-        plt.colorbar(sc, ax=ax1, label='Sharpe Ratio')
-        ax1.set_title('Efficient Frontier')
+        # Creating a figure with a 2x2 grid layout
+        fig, axs = plt.subplots(2, 2, figsize=[16, 16])
 
-        # Adding text to the second subplot
-        ax2.axis('off')  # Turn off the axis for the text subplot
+        # Plotting the Efficient Frontier on the first subplot (top left)
+        sc = axs[0, 0].scatter(vols, returns, c=sharpe_ratios, cmap='RdYlGn')
+        axs[0, 0].scatter(vols[max_sharpe_index], returns[max_sharpe_index],
+                          c="black", marker='*', s=500)  # Highlight the max Sharpe ratio
+        axs[0, 0].set_xlabel('Volatility')
+        axs[0, 0].set_ylabel('Return')
+        fig.colorbar(sc, ax=axs[0, 0], label='Sharpe Ratio')
+        axs[0, 0].set_title('Efficient Frontier')
+
+        # Adding text for the simulation statistics in the second subplot (top right)
+        axs[0, 1].axis('off')  # Turn off the axis for the text subplot
         max_sharpe_ratio = max(sharpe_ratios)
-        s = f'Max Sharpe Ratio: {max_sharpe_ratio:.2f}\n\n'
-        s += f'Portfolio Weights:\n{pd.Series(max_sharpe_portfolio * 100, index=self.portfolio.columns).to_string()}'
-        ax2.text(0.5, 0.5, s, fontsize=12,
-                 ha='center', va='center', wrap=True)
+        text_str = f'Max Sharpe Ratio: {max_sharpe_ratio:.2f}\n\n'
+        text_str += f'Portfolio Weights:\n{pd.Series(max_sharpe_weights * 100, index=self.portfolio.columns).to_string()}'
+        axs[0, 1].text(0.5, 0.5, text_str, fontsize=12, ha='center', va='center', wrap=True)
+
+        # Plotting cumulative returns on the third subplot (bottom left)
+        axs[1, 0].plot(cumulative_returns)
+        axs[1, 0].set_title(f"Cumulative Returns of the Portfolio")
+        axs[1, 0].set_xlabel("Date")
+        axs[1, 0].set_ylabel("Cumulative Returns")
+        axs[1, 0].grid(True)
+
+        # Placeholder for additional plot (bottom right)
+        axs[1, 1].axis('off')  # Currently turned off; replace with another plot as needed
 
         plt.tight_layout()
         plt.show()

@@ -11,9 +11,8 @@ def main():
     simulator = Simulation(portfolio=portfolio.portfolio,
                            trials=10000, risk_free_rate=0.03)
     simulation_results = simulator.simulate()
-    simulator.visualize_efficient_frontier(
+    simulator.visualize_simulation_results(
         simulation_results=simulation_results)
-
 
 if __name__ == "__main__":
     main()

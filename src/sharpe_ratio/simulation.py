@@ -8,12 +8,13 @@ class Simulation():
         self.portfolio = portfolio
         self.TRIALS = trials
         self.RISK_FREE_RATE = risk_free_rate
+        self.TRADING_DAYS = 252
 
     def get_pct_returns(self):
         return self.portfolio.pct_change().dropna()
 
     def get_annualized_mean_returns(self):
-        r = self.get_pct_returns() * 252
+        r = self.get_pct_returns() * self.TRADING_DAYS
         return r.mean()
 
     def get_covariance_matrix(self):
@@ -49,7 +50,7 @@ class Simulation():
             portfolio_variance = np.dot(weights.T, np.dot(cov_matrix, weights))
 
             # Calculate annualized portfolio volatility (standard deviation)
-            portfolio_volatility = np.sqrt(portfolio_variance) * np.sqrt(252)
+            portfolio_volatility = np.sqrt(portfolio_variance) * np.sqrt(self.TRADING_DAYS)
              
             # Calculate the Sharpe ratio for this portfolio
             sharpe_ratio = (portfolio_return -

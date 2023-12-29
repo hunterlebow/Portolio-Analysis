@@ -2,10 +2,9 @@
 
 # Importing classes from submodules for easy access
 from .polygon_api import Polygon
-from .investments import read_tickers
 
 # Defining what gets imported with "from data_processing import *"
-__all__ = ['Polygon', 'read_tickers']
+__all__ = ['Polygon']
 
 # Package initialization code
 print("Initializing data_processing package")

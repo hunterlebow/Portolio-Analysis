@@ -25,7 +25,7 @@ The Stock Portfolio Analysis Project is a comprehensive tool designed to offer i
 ## Getting Started
 To use this project, clone the repository and install the required Python packages listed in `requirements.txt`. Ensure you have access to your own Polygon API key.  
 
-Set self.API_KEY equal to your own Polygon API secret key in src/data_procesing/polygon_api.py
+Set `self.API_KEY` equal to your own Polygon API secret key in `src/data_procesing/polygon_api.py`
 
 ```python
 class Polygon():
